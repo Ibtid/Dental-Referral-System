@@ -1,0 +1,22 @@
+Debug Run: npm run start:dev
+Run: npm run start
+
+Generating new resource:
+nest g resource
+
+Create individual items:
+Let's imagine a real-world scenario, where we need to expose CRUD endpoints for 2 entities, let's say User and Product entities. Following the best practices, for each entity we would have to perform several operations, as follows:
+
+Generate a module (nest g mo) to keep code organized and establish clear boundaries (grouping related components)
+Generate a controller (nest g co) to define CRUD routes (or queries/mutations for GraphQL applications)
+Generate a service (nest g s) to implement & isolate business logic
+Generate an entity class/interface to represent the resource data shape
+Generate Data Transfer Objects (or inputs for GraphQL applications) to define how the data will be sent over the network
+
+Create a controller:
+nest g controller cats
+
+code first approach (create table in postgres)
+First Create a model with table name in schema.prisma file
+Then run: npx prisma migrate dev --name filename
+Ex: npx prisma migrate dev --name updatedUserModel

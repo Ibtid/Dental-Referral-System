@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      body {
+        padding: 4rem;
+      }
+      table {
+        font-family: arial, sans-serif;
+        border-collapse: collapse;
+        width: 100%;
+      }
+
+      td,
+      th {
+        border: 1px solid #dddddd;
+        text-align: left;
+        padding: 8px;
+      }
+
+      tr:nth-child(even) {
+        background-color: #dddddd;
+      }
+    </style>
+  </head>
+  <body>
+    <h1
+      style="
+        text-align: center;
+        margin-top: 1rem;
+        margin-bottom: 2rem;
+        font-size: 3rem;
+      "
+    >
+      Template
+    </h1>
+    <h2>Test Table</h2>
+    <table>
+      <tr>
+        <th>Id</th>
+        <th>Name</th>
+        <th>Age</th>
+        <th>Bio</th>
+        <th>Gender</th>
+        <th>Status</th>
+        <th>Created Date</th>
+      </tr>
+      {{#each tests}}
+      <tr>
+        <td>{{this.id}}</td>
+        <td>{{this.name}}</td>
+        <td>{{this.age}}</td>
+        <td>{{this.bio}}</td>
+        <td>{{this.gender}}</td>
+        <td>{{this.status}}</td>
+        <td>{{this.createdDate}}</td>
+      </tr>
+      {{/each}}
+    </table>
+  </body>
+</html>

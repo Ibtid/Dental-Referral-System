@@ -1,0 +1,11 @@
+(Api's With search field)
+1. Invoice ( get all ) => reportId, patient name, patient address, mobileNumber 
+2. Clinic ( get all ) => name, address, email, mobile 
+3. Patient ( get all ) => name, address, email, contactNumber 
+4. Investigation ( get all ) => name, category, description 
+5. Company ( get all ) => name, shortName, email, address, contactNumber 
+6. CompanyUser ( get all ) => fullName, userName, email
+7. todays-report ( get all api ) => patient name, patient address, mobileNumber, clinic name, clinic email, clinic mobile
+
+from frontend:
+get all api with paginated data => ex: "?page=1&limit=10&search=abc"

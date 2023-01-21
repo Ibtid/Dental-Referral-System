@@ -1,0 +1,60 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model CompanyUser {
+  id                 Int                 @id @default(autoincrement())
+  fullName           String
+  userName           String              @unique(map: "user_name_uindex")
+  email              String              @unique
+  role               String
+  phone              String
+  password           String
+  createdDate        DateTime?           @default(now())
+  lastModifiedBy     Int?
+  lastModifiedDate   DateTime?           @default(now())
+  isDeleted          Boolean?            @default(false)
+  resetPasswordToken ResetPasswordToken?
+  authTokens         AuthTokens?
+}
+
+model Role {
+  id               Int       @id @default(autoincrement())
+  role             String
+  createdDate      DateTime? @default(now())
+  lastModifiedBy   Int?
+  lastModifiedDate DateTime? @default(now())
+  isDeleted        Boolean?  @default(false)
+}
+
+model ResetPasswordToken {
+  id               Int          @id @default(autoincrement())
+  token            String
+  companyUser      CompanyUser? @relation(fields: [companyUserEmail], references: [email])
+  companyUserEmail String?      @unique
+  createdAt        DateTime     @default(now())
+}
+
+model AuthTokens {
+  id                 Int     @id @default(autoincrement())
+  hashedRefreshToken String?
+  hashedAccessToken  String?
+
+  companyUser   CompanyUser? @relation(fields: [companyUserId], references: [id])
+  companyUserId Int?         @unique
+}
+
+model Test {
+  id          Int      @id @default(autoincrement())
+  name        String?
+  age         Int?
+  gender      String?
+  status      String?
+  bio         String?
+  createdDate DateTime @default(now())
+}

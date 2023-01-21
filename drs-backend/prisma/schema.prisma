@@ -1,0 +1,281 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["interactiveTransactions"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum PaymentMethod {
+  Card
+  Cash
+}
+
+enum Status {
+  Active
+  Suspended
+}
+
+enum SmsStatus {
+  Sent
+  Failed
+}
+
+model User {
+  id                 Int                 @id(map: "user_pk") @default(autoincrement()) @db.Integer
+  fullName           String              @db.VarChar(200)
+  userName           String              @db.VarChar(100)
+  email              String              @unique @db.VarChar(100)
+  role               String[]            @db.VarChar(30)
+  phone              String              @db.VarChar(100)
+  password           String              @db.VarChar(255)
+  createdDate        DateTime?           @default(now())
+  lastModifiedBy     Int?
+  lastModifiedDate   DateTime?           @default(now())
+  isDeleted          Boolean?            @default(false)
+  resetPasswordToken ResetPasswordToken?
+  authToken          AuthToken?
+  companyUser        CompanyUser?
+}
+
+model CompanyUser {
+  id               Int       @id(map: "companyUser_pk") @default(autoincrement()) @db.Integer
+  company          Company   @relation(fields: [companyId], references: [id])
+  companyId        Int
+  user             User      @relation(fields: [userId], references: [id])
+  userId           Int       @unique
+  createdDate      DateTime? @default(now())
+  lastModifiedBy   Int?
+  lastModifiedDate DateTime? @default(now())
+  isDeleted        Boolean?  @default(false)
+}
+
+model test {
+  id                  Int     @id(map: "test_pk") @default(autoincrement()) @db.Integer
+  investigationAmount Decimal @db.Decimal(50, 2)
+}
+
+model Role {
+  id               Int       @id(map: "role_pk") @default(autoincrement()) @db.Integer
+  role             String    @unique @db.VarChar(20)
+  createdDate      DateTime? @default(now())
+  lastModifiedBy   Int?
+  lastModifiedDate DateTime? @default(now())
+  isDeleted        Boolean?  @default(false)
+}
+
+model Company {
+  id                   Int                    @id(map: "company_pk") @default(autoincrement()) @db.Integer
+  name                 String                 @db.VarChar(200)
+  shortName            String                 @db.VarChar(100)
+  address              String                 @db.VarChar(500)
+  contactNumber        String                 @db.VarChar(100)
+  email                String                 @unique @db.VarChar(100)
+  website              String?                @db.VarChar(100)
+  status               Status?                @default(Active)
+  logoPath             String?                @db.VarChar(250)
+  createdDate          DateTime?              @default(now())
+  lastModifiedBy       Int?
+  lastModifiedDate     DateTime?              @default(now())
+  isDeleted            Boolean?               @default(false)
+  user                 CompanyUser[]
+  sms                  SmsLog[]
+  invoice              Invoice[]
+  referralBonusPayment ReferralBonusPayment[]
+  partnership          Partnership[]
+  investigation        Investigation[]
+  patient              Patient[]
+}
+
+model ResetPasswordToken {
+  id               Int       @id(map: "resetPasswordToken_pk") @default(autoincrement()) @db.Integer
+  token            String    @db.VarChar(20)
+  user             User?     @relation(fields: [userEmail], references: [email])
+  userEmail        String?   @unique @db.VarChar(100)
+  createdDate      DateTime  @default(now())
+  lastModifiedBy   Int?
+  lastModifiedDate DateTime? @default(now())
+  isDeleted        Boolean?  @default(false)
+}
+
+model AuthToken {
+  id                 Int     @id(map: "jwt_pk") @default(autoincrement()) @db.Integer
+  hashedRefreshToken String?
+  hashedAccessToken  String?
+  user               User?   @relation(fields: [userId], references: [id])
+  userId             Int?    @unique
+}
+
+model Patient {
+  id               Int       @id(map: "patient_pk") @default(autoincrement()) @db.Integer
+  name             String    @db.VarChar(100)
+  company          Company                @relation(fields: [companyId], references: [id])
+  companyId        Int
+  gender           String    @db.VarChar(20)
+  address          String    @db.VarChar(500)
+  contactNumber    String    @db.VarChar(100)
+  email            String?   @db.VarChar(100)
+  age              Int       @db.Integer
+  createdDate      DateTime? @default(now())
+  lastModifiedBy   Int?
+  lastModifiedDate DateTime? @default(now())
+  isDeleted        Boolean?  @default(false)
+  invoice          Invoice[]
+}
+
+model Doctor {
+  id               Int       @id(map: "doctor_pk") @default(autoincrement()) @db.Integer
+  name             String    @db.VarChar(100)
+  speciality       String    @db.VarChar(200)
+  organization     String?   @db.VarChar(200)
+  address          String    @db.VarChar(500)
+  contactNumber    String    @db.VarChar(100)
+  email            String?   @unique @db.VarChar(100)
+  createdDate      DateTime? @default(now())
+  lastModifiedBy   Int?
+  lastModifiedDate DateTime? @default(now())
+  isDeleted        Boolean?  @default(false)
+}
+
+model Invoice {
+  id                   Int                    @id(map: "pathologyReport_pk") @default(autoincrement()) @db.Integer
+  reportId             String                 @unique @db.VarChar(100)
+  patient              Patient                @relation(fields: [patientId], references: [id])
+  patientId            Int
+  clinic               Clinic?                @relation(fields: [clinicId], references: [id])
+  clinicId             Int?                   @db.Integer
+  company              Company                @relation(fields: [companyId], references: [id])
+  companyId            Int                    @db.Integer
+  discount             Decimal                @db.Decimal(50, 2)
+  mobileNumber         String                 @db.VarChar(50)
+  deliveryTime         DateTime
+  grossTotal           Decimal                @db.Decimal(50, 2)
+  total                Decimal                @db.Decimal(50, 2)
+  paid                 Decimal                @db.Decimal(50, 2)
+  due                  Decimal                @db.Decimal(50, 2)
+  paymentMethod        PaymentMethod          @default(Cash)
+  paymentDescription   String?                @db.VarChar(100)
+  firstVisit           DateTime?
+  createdDate          DateTime?              @default(now())
+  lastModifiedBy       Int?
+  lastModifiedDate     DateTime?              @default(now())
+  isDeleted            Boolean?               @default(false)
+  investigation        Investigation[]
+  // investigationAmount  InvestigationAmount[]
+  invoiceInvestigation InvoiceInvestigation[]
+}
+
+model InvoiceInvestigation {
+  id               Int           @id(map: "pathologyInvoice_pk") @default(autoincrement()) @db.Integer
+  invoice          Invoice       @relation(fields: [invoiceId], references: [reportId])
+  invoiceId        String        @db.VarChar(100)
+  investigation    Investigation @relation(fields: [investigationId], references: [id])
+  investigationId  Int
+  amount           Decimal       @db.Decimal(50, 2)
+  reportPath       String?
+  reportUploaded   Boolean       @default(false)
+  createdDate      DateTime?     @default(now())
+  lastModifiedBy   Int?
+  lastModifiedDate DateTime?     @default(now())
+  isDeleted        Boolean?      @default(false)
+}
+
+model Investigation {
+  id                   Int                    @id(map: "investigation_pk") @default(autoincrement()) @db.Integer
+  name                 String                 @db.VarChar(100)
+  company              Company                @relation(fields: [companyId], references: [id])
+  companyId            Int
+  category             String                 @db.VarChar(30)
+  description          String                 @db.VarChar(150)
+  referenceValue       String?                @db.VarChar(1000)
+  cost                 Decimal                @db.Decimal(50, 2)
+  comission            Decimal                @db.Decimal(50, 2)
+  createdDate          DateTime?              @default(now())
+  lastModifiedBy       Int?
+  lastModifiedDate     DateTime?              @default(now())
+  isDeleted            Boolean?               @default(false)
+  invoice              Invoice?               @relation(fields: [invoiceId], references: [reportId])
+  invoiceId            String?
+  invoiceInvestigation InvoiceInvestigation[]
+}
+
+model Clinic {
+  id                   Int                    @id(map: "clinic_pk") @default(autoincrement()) @db.Integer
+  name                 String                 @db.VarChar(255)
+  email                String                 @unique @db.VarChar(255)
+  mobile               String                 @unique @db.VarChar(255)
+  address              String                 @db.VarChar(500)
+  phone                String?                @db.VarChar(100)
+  longitude            Decimal?               @db.Decimal(15, 10)
+  latitude             Decimal?               @db.Decimal(15, 10)
+  status               Status?                @default(Active)
+  createdDate          DateTime?              @default(now())
+  lastModifiedBy       Int?
+  lastModifiedDate     DateTime?              @default(now())
+  isDeleted            Boolean?               @default(false)
+  invoice              Invoice[]
+  referralBonusPayment ReferralBonusPayment[]
+  partnership          Partnership[]
+  sms                  SmsLog[]
+}
+
+model SmsLog {
+  id               Int       @id(map: "smsLog_pk") @default(autoincrement()) @db.Integer
+  receiverPhone    String    @db.VarChar(100)
+  message          String    @db.VarChar(200)
+  timeStamp        DateTime  @default(now())
+  clinic           Clinic?   @relation(fields: [clinicId], references: [id])
+  clinicId         Int?
+  company          Company   @relation(fields: [companyId], references: [id])
+  companyId        Int
+  status           SmsStatus
+  statusMessage    String?
+  type             String
+  createdDate      DateTime? @default(now())
+  lastModifiedBy   Int?
+  lastModifiedDate DateTime? @default(now())
+  isDeleted        Boolean?  @default(false)
+}
+
+model Partnership {
+  id               Int       @id(map: "partnership_pk") @default(autoincrement()) @db.Integer
+  clinic           Clinic    @relation(fields: [clinicId], references: [id])
+  clinicId         Int       @db.Integer
+  company          Company   @relation(fields: [companyId], references: [id])
+  companyId        Int       @db.Integer
+  createdDate      DateTime? @default(now())
+  lastModifiedBy   Int?
+  lastModifiedDate DateTime? @default(now())
+  isDeleted        Boolean?  @default(false)
+}
+
+model ReferralBonusPayment {
+  id                  Int       @id(map: "referralBonusPayment_pk") @default(autoincrement()) @db.Integer
+  clinic              Clinic    @relation(fields: [clinicId], references: [id])
+  clinicId            Int       @db.Integer
+  company             Company   @relation(fields: [companyId], references: [id])
+  companyId           Int
+  invoiceAmount       Int       @db.Integer
+  discountAmount      Decimal   @db.Decimal(50, 2)
+  totalReferralAmount Decimal   @db.Decimal(50, 2)
+  finalReferralAmount Decimal   @db.Decimal(50, 2)
+  paymentMonth        DateTime
+  meansOfPayment      String    @db.VarChar(30)
+  description         String    @db.VarChar(300)
+  createdDate         DateTime? @default(now())
+  lastModifiedBy      Int?
+  lastModifiedDate    DateTime? @default(now())
+  isDeleted           Boolean?  @default(false)
+}
+
+model Otp {
+  id               Int       @id(map: "otp_pk") @default(autoincrement()) @db.Integer
+  otp              String    @db.VarChar(4)
+  mobile           String    @db.VarChar(100)
+  createdDate      DateTime? @default(now())
+  lastModifiedBy   Int?
+  lastModifiedDate DateTime? @default(now())
+  isDeleted        Boolean?  @default(false)
+}

@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Test" ADD COLUMN "age" INTEGER;
+ALTER TABLE "Test" ADD COLUMN "content" TEXT;
